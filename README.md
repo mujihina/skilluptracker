@@ -1,5 +1,5 @@
 **Author:** Mujihina
-**Version:** v 1.2014.05.15
+**Version:** v 1.01
 
 # Skillcaps #
 
@@ -54,5 +54,8 @@ sut h cr
 
 ##Changelog##
 
-### v1.2014.05.15 ###
+### v1.01 ###
+   Small fixes to compensate for lua's weird handling of floats.
+
+### v1.0 ###
 * First release.
