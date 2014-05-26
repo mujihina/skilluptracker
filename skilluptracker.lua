@@ -363,8 +363,7 @@ function update_skill(skill_id, level)
         local max = get_max_level (tonumber(skill_id))
         -- Show skills we believe to be maxed out in a different color
         if ( (max > 0) and ((level + 0.01) >= max) ) then
-            global.textdata["%s_cs":format(short_name)] = '\\cs(100,100,255)'
-            global.textdata["%s_cr":format(short_name)] = '\\cr'            
+            global.textdata["%s_cs":format(short_name)] = '(100,100,255)'
         end
         global.config.save(global.settings, 'all')
     end    
@@ -381,13 +380,16 @@ function create_text_boxes()
             local short_name = global.settings.skills[tostring(i)]['short_name']
             local full_name = v['name']:rpad(' ', 18)
             -- format: <color_start or nil><full_name plus padding> <level float or 0> / <level_cap or 0><color end or nil>
-            -- e.g. ${archery_cs|}Archery:      ${archery_level|0} / ${archery_max|0}${archery_cr|}
-            combatbox_template:append('${%s_cs|}%s${%s_level|0} / ${%s_max|0}${%s_cr|}':format (short_name, full_name, short_name, short_name, short_name))
+            -- e.g. ${archery_cs|\\cs(255,255,255)}Archery:      ${archery_level|0} / ${archery_max|0}\\cr
+            combatbox_template:append('\\cs${%s_cs|(255,255,255)}%s${%s_level|0} / ${%s_max|0}\\cr ':format (short_name, full_name, short_name, short_name))
         end
     end
     if (combatbox_template:length() < 2) then
         combatbox_template:append('(none)')
+    else 
+    	combatbox_template:append (' ')    
     end
+
     if (global.combatbox) then    
         global.combatbox:destroy()
     end
@@ -403,13 +405,16 @@ function create_text_boxes()
             local short_name = global.settings.skills[tostring(i)]['short_name']
             local full_name = v['name']:rpad(' ', 18)
             -- format: <color_start or nil><full_name plus padding> <level float or 0> / <level_cap or 0><color end or nil>
-            -- e.g. ${archery_cs|}Archery:      ${archery_level|0} / ${archery_max|0}${archery_cr|}
-            magicbox_template:append('${%s_cs|}%s${%s_level|0} / ${%s_max|0}${%s_cr|}':format (short_name, full_name, short_name, short_name, short_name))
+            -- e.g. ${archery_cs|\\cs(255,255,255)}Archery:      ${archery_level|0} / ${archery_max|0}\\cr
+            magicbox_template:append('\\cs${%s_cs|(255,255,255)}%s${%s_level|0} / ${%s_max|0}\\cr ':format (short_name, full_name, short_name, short_name))
         end
     end
     if (magicbox_template:length() < 2) then
         magicbox_template:append('(none)')
+    else
+    	magicbox_template:append (' ')
     end
+
     if (global.magicbox) then
         global.magicbox:destroy()
     end
@@ -426,11 +431,14 @@ function create_text_boxes()
         local full_name = v['name']:rpad(' ', 18)
         -- format: <full_name plus padding> <level float or 0>
         -- e.g. Cooking      ${cooking_level|0}
-        craftbox_template:append('%s${%s_level|0}':format (full_name, short_name))        
+        craftbox_template:append('%s${%s_level|0} ':format (full_name, short_name))        
     end
     if (craftbox_template:length() < 2) then
         craftbox_template:append('(none)')
+    else
+        craftbox_template:append(' ')
     end
+
     if (global.craftbox) then    
         global.craftbox:destroy()
     end
@@ -444,7 +452,7 @@ end
 function update_text_boxes()
     global.combatbox:update(global.textdata)
     global.magicbox:update(global.textdata)
-    global.craftbox:update(global.textdata)
+    global.craftbox:update(global.textdata)    
 end
 
 
@@ -621,6 +629,7 @@ function process_skillup_text (original, modified, original_mode, modified_mode,
                     return "%s (%0.1f/%d)":format(original, old_level, max)
                 end
             end
+            --DEBUG MESSAGE
             print ("------------")
             print ("OUT OF SYNC:")
             print (old_level, old_level:floor(), new_level, new_level:floor())
