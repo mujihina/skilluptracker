@@ -41,9 +41,14 @@ _addon.commands = {'sut'}
 -- resources.skills
 -- resources.jobs
 -- texts
--- job_grades.lua
+-- job_grades.lua (included with this addon)
 require ('luau')
 require ('pack')
+lib = {}
+lib.config = require ('config')
+lib.skills = require ('resources').skills
+lib.texts = require ('texts')
+lib.grades = require ('job_grades')
 
 -- Load Defaults
 function load_defaults()
@@ -55,13 +60,6 @@ function load_defaults()
     
     -- Main global structure
     global = {}
-    -- Required libs
-    global.config = require ('config')
-    global.skills = require ('resources').skills
-    global.texts = require ('texts')
-    global.grades = require ('job_grades')
-    global.jobs = require ('resources').jobs
-
     global.player_name = windower.ffxi.get_player().name
     global.skills_file = "data/%s.xml":format(global.player_name)
     global.main_job_id = 0
@@ -135,15 +133,15 @@ function load_defaults()
     local current_skills = windower.ffxi.get_player().skills
     
     -- Set current skills as default values
-    for i,_ in pairs (global.skills) do
+    for i,_ in pairs (lib.skills) do
         -- Skip the weird (n/a) entry with index 0,  and puppet skills
-        if ( (i ~= 0) and (global.skills[i]['category'] ~= 'Puppet') ) then
+        if ( (i ~= 0) and (lib.skills[i]['category'] ~= 'Puppet') ) then
             local skill_index = tostring(i)
             -- short name is the way it shows in the windower.ffxi.get_player().skills table
-            local short_name = global.skills[i]['name']:lower():gsub(' ', '_'):gsub('-','_')
+            local short_name = lib.skills[i]['name']:lower():gsub(' ', '_'):gsub('-','_')
             global.defaults.skills[skill_index] = T{}
             global.defaults.skills[skill_index]['id'] = tonumber(skill_index)
-            global.defaults.skills[skill_index]['name'] = global.skills[i]['name']
+            global.defaults.skills[skill_index]['name'] = lib.skills[i]['name']
             global.defaults.skills[skill_index]['short_name'] = short_name
             if (not current_skills[short_name]) then
                 print ("DEBUG: sut warning: Could not find skill %s":format(short_name))
@@ -155,7 +153,7 @@ function load_defaults()
     end
         
     -- Load previous settings
-    global.settings = global.config.load(global.skills_file, global.defaults)
+    global.settings = lib.config.load(global.skills_file, global.defaults)
     
     -- Load skills
     load_skills()
@@ -169,7 +167,7 @@ function get_skill_id(skill_name)
     --Fix for Leathercraft/Leatherworking
     if (skill_name == "Leatherworking") then skill_name = "Leathercraft" end
     
-    local skill = global.skills:with('name', skill_name)
+    local skill = lib.skills:with('name', skill_name)
     if (skill) then
         return tostring(skill.id)
     else
@@ -291,13 +289,13 @@ end
 -- Get max skill level of skill with skill id = i
 function get_max_level (i)
     -- Don't look up grades or max skillcap for crafting skills
-    if (global.skills[tonumber(i)]['category'] == 'Synthesis') then return 0 end
+    if (lib.skills[tonumber(i)]['category'] == 'Synthesis') then return 0 end
 
-    local main_grade = global.grades[i][global.main_job_id]
+    local main_grade = lib.grades[i][global.main_job_id]
     local main_max = calculate_max (global.main_job_level, main_grade)
 
     if (global.sub_job_id) then
-        local sub_grade = global.grades[i][global.sub_job_id]
+        local sub_grade = lib.grades[i][global.sub_job_id]
         local sub_max = calculate_max (global.sub_job_level, sub_grade)
         return math.max (main_max, sub_max)
     else
@@ -346,7 +344,7 @@ function load_skills()
         end
         update_skill (skill_index, stored_level)
         -- Display max level for non-synthesis skills
-        if (global.skills[tonumber(skill_index)]['category'] ~= 'Synthesis') then
+        if (lib.skills[tonumber(skill_index)]['category'] ~= 'Synthesis') then
             global.textdata["%s_max":format(skill_name)] = "%d":format(get_max_level(tonumber(skill_index)))
         end
     end
@@ -365,7 +363,7 @@ function update_skill(skill_id, level)
         if ( (max > 0) and ((level + 0.01) >= max) ) then
             global.textdata["%s_cs":format(short_name)] = '(100,100,255)'
         end
-        global.config.save(global.settings, 'all')
+        lib.config.save(global.settings, 'all')
     end    
 end
 
@@ -374,9 +372,9 @@ end
 function create_text_boxes()
     -- Combat Skills
     local combatbox_template = L{'\\cs(0,255,255)Combat Skills\\cr'}
-    for i,v in pairs(global.skills:category('Combat')) do
+    for i,v in pairs(lib.skills:category('Combat')) do
         -- Only show skills with grade better than Z
-        if ( (global.grades[i][global.main_job_id] ~= 'Z') or (global.sub_job_id and (global.grades[i][global.sub_job_id] ~= 'Z')) ) then
+        if ( (lib.grades[i][global.main_job_id] ~= 'Z') or (global.sub_job_id and (lib.grades[i][global.sub_job_id] ~= 'Z')) ) then
             local short_name = global.settings.skills[tostring(i)]['short_name']
             local full_name = v['name']:rpad(' ', 18)
             -- format: <color_start or nil><full_name plus padding> <level float or 0> / <level_cap or 0><color end or nil>
@@ -393,15 +391,15 @@ function create_text_boxes()
     if (global.combatbox) then    
         global.combatbox:destroy()
     end
-    global.combatbox = global.texts.new (combatbox_template:concat('\n'), global.settings.combatbox)
+    global.combatbox = lib.texts.new (combatbox_template:concat('\n'), global.settings.combatbox)
     global.combatbox:update(global.textdata)
     if (global.settings.combatbox.show) then global.combatbox:show() end
     
     -- Magic Skills
     local magicbox_template = L{'\\cs(0,255,255)Magic Skills\\cr'}
-    for i,v in pairs(global.skills:category('Magic')) do
+    for i,v in pairs(lib.skills:category('Magic')) do
         -- Only show skills with grade better than Z
-        if ( (global.grades[i][global.main_job_id] ~= 'Z') or (global.sub_job_id and (global.grades[i][global.sub_job_id] ~= 'Z')) ) then
+        if ( (lib.grades[i][global.main_job_id] ~= 'Z') or (global.sub_job_id and (lib.grades[i][global.sub_job_id] ~= 'Z')) ) then
             local short_name = global.settings.skills[tostring(i)]['short_name']
             local full_name = v['name']:rpad(' ', 18)
             -- format: <color_start or nil><full_name plus padding> <level float or 0> / <level_cap or 0><color end or nil>
@@ -419,14 +417,14 @@ function create_text_boxes()
         global.magicbox:destroy()
     end
 
-    global.magicbox = global.texts.new (magicbox_template:concat('\n'), global.settings.magicbox)
+    global.magicbox = lib.texts.new (magicbox_template:concat('\n'), global.settings.magicbox)
     global.magicbox:update(global.textdata)
 
     if (global.settings.magicbox.show) then global.magicbox:show() end
 
     -- Craft Skills
     local craftbox_template = L{'\\cs(0,255,255)Craft Skills\\cr'}
-    for i,v in pairs(global.skills:category('Synthesis')) do
+    for i,v in pairs(lib.skills:category('Synthesis')) do
         local short_name = global.settings.skills[tostring(i)]['short_name']
         local full_name = v['name']:rpad(' ', 18)
         -- format: <full_name plus padding> <level float or 0>
@@ -442,7 +440,7 @@ function create_text_boxes()
     if (global.craftbox) then    
         global.craftbox:destroy()
     end
-    global.craftbox = global.texts.new (craftbox_template:concat('\n'), global.settings.craftbox)
+    global.craftbox = lib.texts.new (craftbox_template:concat('\n'), global.settings.craftbox)
     global.craftbox:update(global.textdata)
     if (global.settings.craftbox.show) then global.craftbox:show() end
 end
@@ -509,28 +507,28 @@ function sut_command (cmd, arg)
             global.settings.combatbox.show = false
             global.settings.magicbox.show = false
             global.settings.craftbox.show = false
-            global.config.save(global.settings, 'all')
+            lib.config.save(global.settings, 'all')
             return
         end
         -- hide combat only
         if (arg == 'combat' or arg == 'co') then
             global.combatbox:hide()
             global.settings.combatbox.show = false
-            global.config.save(global.settings, 'all')
+            lib.config.save(global.settings, 'all')
             return
         end
         -- hide magic only
         if (arg == 'magic' or arg == 'm') then
             global.magicbox:hide()
             global.settings.magicbox.show = false
-            global.config.save(global.settings, 'all')
+            lib.config.save(global.settings, 'all')
             return
         end
         -- hide craft only
         if (arg == 'craft' or arg == 'cr') then
             global.craftbox:hide()
             global.settings.craftbox.show = false
-            global.config.save(global.settings, 'all')
+            lib.config.save(global.settings, 'all')
             return
         end
         windower.add_to_chat (167, 'sut: Check your syntax')
@@ -544,7 +542,7 @@ function sut_command (cmd, arg)
             global.settings.combatbox.show = true
             global.settings.magicbox.show = true
             global.settings.craftbox.show = true
-            global.config.save(global.settings, 'all')
+            lib.config.save(global.settings, 'all')
             global.combatbox:show()
             global.magicbox:show()
             global.craftbox:show()
@@ -553,21 +551,21 @@ function sut_command (cmd, arg)
         -- show combat only
         if (arg == 'combat' or arg == 'co') then
             global.settings.combatbox.show = true
-            global.config.save(global.settings, 'all')
+            lib.config.save(global.settings, 'all')
             global.combatbox:show()
             return
         end
         -- show magic only
         if (arg == 'magic' or arg == 'm') then
             global.settings.magicbox.show = true
-            global.config.save(global.settings, 'all')
+            lib.config.save(global.settings, 'all')
             global.magicbox:show()
             return
         end
         -- show craft only
         if (arg == 'craft' or arg == 'cr') then
             global.settings.craftbox.show = true
-            global.config.save(global.settings, 'all')
+            lib.config.save(global.settings, 'all')
             global.craftbox:show()
             return
         end
@@ -600,7 +598,7 @@ function process_skillup_text (original, modified, original_mode, modified_mode,
             update_skill (skill_id, new_level)
             update_text_boxes()
 
-            if (global.skills[tonumber(skill_id)]['category'] == 'Synthesis') then
+            if (lib.skills[tonumber(skill_id)]['category'] == 'Synthesis') then
                 return "%s (%0.1f)":format(original, new_level)
             else
                 local max = get_max_level (tonumber(skill_id))
@@ -622,7 +620,7 @@ function process_skillup_text (original, modified, original_mode, modified_mode,
     
             -- in sync
             if ((old_level + 0.01):floor() == new_level:floor()) then
-                if (global.skills[tonumber(skill_id)]['category'] == 'Synthesis') then
+                if (lib.skills[tonumber(skill_id)]['category'] == 'Synthesis') then
                     return "%s (%0.1f)":format(original, old_level)
                 else
                     local max = get_max_level (tonumber(skill_id))
