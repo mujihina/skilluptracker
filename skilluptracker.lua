@@ -162,8 +162,9 @@ end
 
 -- get short name of skill, and return skill id.
 function get_skill_id(skill_name)
+    --print ("original skill is %s":format(skill_name))
     --Fix for Hand-to-hand
-    if (skill_name == "Hand To Hand") then skill_name = "Hand-to-Hand" end
+    if (skill_name == "Hand To Hand" or skill_name == "Hand-to-hand") then skill_name = "Hand-to-Hand" end
     --Fix for Leathercraft/Leatherworking
     if (skill_name == "Leatherworking") then skill_name = "Leathercraft" end
     
@@ -331,7 +332,7 @@ function load_skills()
     end
 
     for i,v in pairs (windower.ffxi.get_player().skills) do
-        local skill_index = get_skill_id(i:gsub('_', ' '):capitalize())
+        local skill_index = get_skill_id(i:gsub('_', ' '):gsub('-', ' '):capitalize())
         local stored_level = global.settings.skills[skill_index]['level']
         local skill_name = global.settings.skills[skill_index]['short_name']        
 
@@ -581,11 +582,14 @@ end
 -- Process incoming texts
 function process_skillup_text (original, modified, original_mode, modified_mode, blocked)    
     -- All skill up msgs have mode = 129.
-    if (original_mode == 129) then                
+    if (original_mode == 129) then
+    	line = original:strip_colors()
+    	--print ("original is %s":format(original))
+    	--print ("modified is %s":format(modified))                
         -- skillup increase
         -- example: "Name's healing magic skill rises 0.3 points."
-        if (original:match('skill rises')) then
-            local _,_, player_name, skill_name, increase  = original:find("(%a+)'s (.+) skill rises 0.(%d+)")
+        if (line:match('skill rises')) then
+            local _,_, player_name, skill_name, increase  = line:find("(%a+)'s (.+) skill rises 0.(%d+)")
             local skill_id = get_skill_id(skill_name:capitalize())
 
             -- Unable to find skill_id
@@ -608,8 +612,8 @@ function process_skillup_text (original, modified, original_mode, modified_mode,
         
         -- new skill level 
         -- example: "Name's healing magic skill reaches level 167"
-        if (original:match('skill reaches')) then
-            local _,_, player_name, skill_name, level_str  = original:find("(%a+)'s (.+) skill reaches level (%d+)")
+        if (line:match('skill reaches')) then
+            local _,_, player_name, skill_name, level_str  = line:find("(%a+)'s (.+) skill reaches level (%d+)")
             local skill_id = get_skill_id(skill_name:capitalize())
 
             -- Unable to find skill_id
