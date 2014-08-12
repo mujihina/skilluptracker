@@ -310,6 +310,9 @@ end
 function load_skills()
     if (not windower.ffxi.get_info().logged_in) then return end
     
+    -- Load defaults if needed
+    if (not global) then load_defaults() return end
+    
     --Added to avoid issues when changing characters too fast
     if (global.player_name ~= windower.ffxi.get_player().name) then
         print ("sut: Reloading")
@@ -318,8 +321,6 @@ function load_skills()
         return
     end
 
-    -- Load defaults if needed
-    if (not global) then load_defaults() return end
     
     local player = windower.ffxi.get_player()
     local main_job = player.main_job_full
@@ -477,8 +478,6 @@ function logout()
     --global.clear()
     global = nil
 end
-
-
 
 
 -- Show syntax
@@ -639,6 +638,14 @@ function process_skillup_text (original, modified, original_mode, modified_mode,
                     return "%s (%0.1f/%d)":format(original, old_level, max)
                 end
             end
+            --[[
+            --DEBUG MESSAGE
+            print ("------------")
+            print ("OUT OF SYNC:")
+            print (old_level, old_level:floor(), new_level, new_level:floor())
+            print('nnnn':pack(old_level, old_level:floor(), new_level, new_level:floor()):hex(' '))
+            print ("------------")
+          ]]
             
             -- out of sync
             update_skill (skill_id, new_level)
