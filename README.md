@@ -1,5 +1,5 @@
 **Author:** Mujihina
-**Version:** v 1.01
+**Version:** v 1.02
 
 # Skillcaps #
 
@@ -53,6 +53,9 @@ sut h cr
 
 
 ##Changelog##
+
+### v1.02 ###
+   Minor changes and fix for issue when changing chars too fast.
 
 ### v1.01 ###
    Small fixes to compensate for lua's weird handling of floats.
