@@ -1,5 +1,5 @@
 --[[
-skilluptracker v1.02
+skilluptracker v1.03
 
 Copyright (c) 2014, Mujihina
 All rights reserved.
@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'skilluptracker'
 _addon.author  = 'Mujihina'
-_addon.version = '1.02'
+_addon.version = '1.03'
 _addon.command = 'skilluptracker'
 _addon.commands = {'sut'}
 
@@ -49,6 +49,7 @@ lib.config = require ('config')
 lib.skills = require ('resources').skills
 lib.texts = require ('texts')
 lib.grades = require ('job_grades')
+
 
 -- Load Defaults
 function load_defaults()
@@ -133,9 +134,10 @@ function load_defaults()
     local current_skills = windower.ffxi.get_player().skills
     
     -- Set current skills as default values
-    for i,_ in pairs (lib.skills) do
+    --for i,_ in ipairs (lib.skills) do
+    for _,i in lib.skills:it() do
         -- Skip the weird (n/a) entry with index 0,  and puppet skills
-        if ( (i ~= 0) and (lib.skills[i]['category'] ~= 'Puppet') ) then
+        if ( (i ~= 0) and (lib.skills[i]['category'] ~= 'Puppet')) then
             local skill_index = tostring(i)
             -- short name is the way it shows in the windower.ffxi.get_player().skills table
             local short_name = lib.skills[i]['name']:lower():gsub(' ', '_'):gsub('-','_')
@@ -151,7 +153,6 @@ function load_defaults()
             end
         end
     end
-        
     -- Load previous settings
     global.settings = lib.config.load(global.skills_file, global.defaults)
     
@@ -382,7 +383,7 @@ end
 function create_text_boxes()
     -- Combat Skills
     local combatbox_template = L{'\\cs(0,255,255)Combat Skills\\cr'}
-    for i,v in pairs(lib.skills:category('Combat')) do
+      for v, i in lib.skills:category('Combat'):it() do
         -- Only show skills with grade better than Z
         if ( (lib.grades[i][global.main_job_id] ~= 'Z') or (global.sub_job_id and (lib.grades[i][global.sub_job_id] ~= 'Z')) ) then
             local short_name = global.settings.skills[tostring(i)]['short_name']
@@ -407,7 +408,7 @@ function create_text_boxes()
     
     -- Magic Skills
     local magicbox_template = L{'\\cs(0,255,255)Magic Skills\\cr'}
-    for i,v in pairs(lib.skills:category('Magic')) do
+    for v,i in lib.skills:category('Magic'):it() do
         -- Only show skills with grade better than Z
         if ( (lib.grades[i][global.main_job_id] ~= 'Z') or (global.sub_job_id and (lib.grades[i][global.sub_job_id] ~= 'Z')) ) then
             local short_name = global.settings.skills[tostring(i)]['short_name']
@@ -434,7 +435,7 @@ function create_text_boxes()
 
     -- Craft Skills
     local craftbox_template = L{'\\cs(0,255,255)Craft Skills\\cr'}
-    for i,v in pairs(lib.skills:category('Synthesis')) do
+    for v,i in lib.skills:category('Synthesis'):it() do
         local short_name = global.settings.skills[tostring(i)]['short_name']
         local full_name = v['name']:rpad(' ', 18)
         -- format: <full_name plus padding> <level float or 0>
@@ -664,8 +665,9 @@ function delay_load_skills()
 end
 
 function level_change(new)
-    print ("level change")
-    print ("new level is %d":format(new))
+	-- Debug
+    -- print ("level change")
+    -- print ("new level is %d":format(new))
     load_skills()
 end
 
