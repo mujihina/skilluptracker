@@ -17,7 +17,7 @@ return { -- start of return block
                 [15] = "Z", -- SMN
                 [16] = "Z", -- BLU
                 [17] = "Z", -- COR
-                [18] = "B+", -- PUP
+                [18] = "A+", -- PUP
                 [19] = "D", -- DNC
                 [20] = "Z", -- SCH
                 [21] = "Z", -- GEO
@@ -30,7 +30,7 @@ return { -- start of return block
                 [3] = "Z", -- WHM
                 [4] = "D", -- BLM
                 [5] = "B", -- RDM
-                [6] = "A-", -- THF
+                [6] = "A+", -- THF
                 [7] = "C-", -- PLD
                 [8] = "C", -- DRK
                 [9] = "C+", -- BST
@@ -43,7 +43,7 @@ return { -- start of return block
                 [16] = "Z", -- BLU
                 [17] = "B+", -- COR
                 [18] = "C-", -- PUP
-                [19] = "B+", -- DNC
+                [19] = "A+", -- DNC
                 [20] = "D", -- SCH
                 [21] = "C-", -- GEO
                 [22] = "Z", -- RUN
@@ -65,7 +65,7 @@ return { -- start of return block
                 [13] = "C", -- NIN
                 [14] = "C-", -- DRG
                 [15] = "Z", -- SMN
-                [16] = "A-", -- BLU
+                [16] = "A+", -- BLU
                 [17] = "B-", -- COR
                 [18] = "Z", -- PUP
                 [19] = "D", -- DNC
@@ -108,7 +108,7 @@ return { -- start of return block
                 [6] = "Z", -- THF
                 [7] = "Z", -- PLD
                 [8] = "B-", -- DRK
-                [9] = "A-", -- BST
+                [9] = "A+", -- BST
                 [10] = "Z", -- BRD
                 [11] = "B-", -- RNG
                 [12] = "Z", -- SAM
@@ -212,7 +212,7 @@ return { -- start of return block
                 [10] = "Z", -- BRD
                 [11] = "Z", -- RNG
                 [12] = "Z", -- SAM
-                [13] = "A-", -- NIN
+                [13] = "A+", -- NIN
                 [14] = "Z", -- DRG
                 [15] = "Z", -- SMN
                 [16] = "Z", -- BLU
@@ -385,7 +385,7 @@ return { -- start of return block
                 [8] = "Z", -- DRK
                 [9] = "Z", -- BST
                 [10] = "Z", -- BRD
-                [11] = "A-", -- RNG
+                [11] = "A+", -- RNG
                 [12] = "C+", -- SAM
                 [13] = "E", -- NIN
                 [14] = "Z", -- DRG
@@ -410,7 +410,7 @@ return { -- start of return block
                 [8] = "E", -- DRK
                 [9] = "Z", -- BST
                 [10] = "Z", -- BRD
-                [11] = "A-", -- RNG
+                [11] = "A+", -- RNG
                 [12] = "Z", -- SAM
                 [13] = "C", -- NIN
                 [14] = "Z", -- DRG
@@ -436,8 +436,8 @@ return { -- start of return block
                 [9] = "Z", -- BST
                 [10] = "E", -- BRD
                 [11] = "C-", -- RNG
-                [12] = "C", -- SAM
-                [13] = "A-", -- NIN
+                [12] = "C+", -- SAM
+                [13] = "A+", -- NIN
                 [14] = "Z", -- DRG
                 [15] = "Z", -- SMN
                 [16] = "Z", -- BLU
@@ -695,7 +695,7 @@ return { -- start of return block
                 [18] = "Z", -- PUP
                 [19] = "Z", -- DNC
                 [20] = "D", -- SCH
-                [21] = "Z", -- GEO
+                [21] = "C", -- GEO
                 [22] = "Z", -- RUN
                 [23] = "Z", -- MON
         }, -- end of "Dark Magic" block
@@ -865,7 +865,7 @@ return { -- start of return block
                 [13] = "Z", -- NIN
                 [14] = "Z", -- DRG
                 [15] = "Z", -- SMN
-                [16] = "A+", -- BLU
+                [16] = "Z", -- BLU
                 [17] = "Z", -- COR
                 [18] = "Z", -- PUP
                 [19] = "Z", -- DNC
@@ -890,7 +890,7 @@ return { -- start of return block
                 [13] = "Z", -- NIN
                 [14] = "Z", -- DRG
                 [15] = "Z", -- SMN
-                [16] = "A+", -- BLU
+                [16] = "Z", -- BLU
                 [17] = "Z", -- COR
                 [18] = "Z", -- PUP
                 [19] = "Z", -- DNC
